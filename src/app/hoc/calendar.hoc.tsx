@@ -8,7 +8,33 @@ import interactionPlugin, {
   DateClickArg,
   EventDragStopArg,
 } from "@fullcalendar/interaction"; // Interaction features
-import { EventClickArg, EventDropArg, EventSourceInput } from "fullcalendar";
+import {
+  EventClickArg,
+  EventDropArg,
+  EventSourceInput,
+  EventContentArg,
+} from "fullcalendar";
+import { EventColor } from "../helpers/constants.ts";
+import { EventCategory } from "@models";
+
+const CustomEvent = (props: { customEvent: EventContentArg }) => {
+  const category: EventCategory =
+    props.customEvent.event.extendedProps.category;
+  // Render a custom event component with event details
+  return (
+    <div
+      style={{
+        backgroundColor: EventColor[category],
+        padding: "5px",
+        width: "100%",
+      }}
+    >
+      <strong>{props.customEvent.event.title}</strong>
+      <br />
+      <small>{props.customEvent?.event?.start?.toLocaleString()}</small>
+    </div>
+  );
+};
 
 interface ICalendarProps {
   views:
@@ -50,6 +76,8 @@ const Calendar: React.FC<ICalendarProps> = (props: ICalendarProps) => {
         eventDragStop={onEventDragStop}
         eventDrop={onEventDrop}
         droppable={true}
+        editable={true}
+        eventContent={(eventInfo) => <CustomEvent customEvent={eventInfo} />} // Custom rendering of events
       />
     </div>
   );
