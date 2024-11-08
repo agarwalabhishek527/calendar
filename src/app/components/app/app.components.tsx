@@ -1,7 +1,8 @@
 import "./app.styles.css";
+import { CalendarComp } from "@components";
 
 const App = (): JSX.Element => {
-  return <div>Hello</div>;
+  return <CalendarComp />;
 };
 
 export default App;
