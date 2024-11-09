@@ -1,9 +1,4 @@
-import axios, {
-  AxiosInstance,
-  AxiosResponse,
-  AxiosRequestConfig,
-  AxiosError,
-} from "axios";
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 import * as _ from "lodash";
 
 import Config from "@config";
@@ -13,7 +8,7 @@ export class APIServiceImpl implements APIService {
   service: AxiosInstance;
   constructor() {
     this.service = axios.create({
-      baseURL: Config.apiEndpoint,
+      baseURL: Config.apiEndpoint || "",
     });
     this.service.interceptors.request.use((request): any => {
       // can modify request here ex- send auth token

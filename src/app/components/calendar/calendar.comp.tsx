@@ -1,32 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { CalendarHOC } from "@hoc";
+import { EventService, EventServiceImpl } from "@services";
 import EventModal from "../event/EventModal";
-import { Event, EventCategory } from "@models";
+import { Event } from "@models";
 import getFormattedDate from "src/app/helpers/utils/getFormattedDate";
+import { Container, CssBaseline } from "@mui/material";
+
+const eventService: EventService = new EventServiceImpl();
 
 export default function CalendarComp() {
   const [modalVisible, setModalVisible] = useState(false);
   const [eventModalData, setEventModalData] = useState<Event | undefined>();
 
-  const [events, setEvents] = useState<Event[]>([
-    {
-      title: "Meeting with Team",
-      start: "2024-11-15T10:00:00",
-      end: "2024-11-15T12:00:00",
-      reminder: true, // Boolean value to represent if reminder is set
-      category: EventCategory.Event1, // Custom event category
-      id: "event_2", // Custom event ID
-    },
-    {
-      title: "Conference",
-      start: "2024-11-20T09:00:00",
-      end: "2024-11-20T11:00:00",
-      reminder: true, // Boolean value to represent if reminder is set
-      category: EventCategory.Event1, // Custom event category
-      id: "event_1", // Custom event ID
-    },
-  ]);
+  const [events, setEvents] = useState<Event[]>([]);
 
   //   Customize the views
   const views = {
@@ -75,12 +62,25 @@ export default function CalendarComp() {
   };
 
   const onSave = (event: any) => {
-    setEvents([...events, event]);
+    if (eventModalData) {
+      const updatedEvents = events.map((e) => (e.id === event.id ? event : e));
+      setEvents(updatedEvents);
+      eventService.updateEvent(event.id, event);
+    } else {
+      setEvents([...events, event]);
+      eventService.createEvent(event);
+    }
   };
 
   const handleEventDrop = (info: any) => {
     const updatedEvents = events.map((event) => {
-      if (event.title === info.event.title) {
+      if (event.id === info.event.id) {
+        eventService.updateEvent(event.id, {
+          ...event,
+          start: info.event.startStr,
+          end: info.event.endStr,
+        });
+
         // Update the event with the new start and end time
         return {
           ...event,
@@ -117,6 +117,17 @@ export default function CalendarComp() {
     return () => clearInterval(reminderInterval); // Cleanup on component unmount
   }, [events]);
 
+  useEffect(() => {
+    eventService
+      .getAllEvent()
+      .then((response) => {
+        setEvents(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
   return (
     <>
       <EventModal
@@ -125,14 +136,16 @@ export default function CalendarComp() {
         onSave={onSave}
         eventData={eventModalData}
       />
-
-      <CalendarHOC
-        events={events}
-        views={views}
-        onDateClick={onDateClick}
-        onEventDrop={handleEventDrop}
-        onEventClick={onEventClick}
-      />
+      <Container maxWidth="lg" style={{ padding: "10px" }}>
+        <CssBaseline />
+        <CalendarHOC
+          events={events}
+          views={views}
+          onDateClick={onDateClick}
+          onEventDrop={handleEventDrop}
+          onEventClick={onEventClick}
+        />
+      </Container>
     </>
   );
 }

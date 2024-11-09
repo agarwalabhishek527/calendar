@@ -6,6 +6,7 @@
       "@config": ["src/app/config.ts"],
       "@components": ["src/app/components/index.ts"],
       "@hoc": ["src/app/hoc/index.ts"],
+      "@services": ["src/app/services/index.ts"],
       "@models": ["src/app/models/index.ts"]
     },
     "lib": ["dom", "dom.iterable", "esnext"],

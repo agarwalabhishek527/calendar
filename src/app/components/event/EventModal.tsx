@@ -14,7 +14,7 @@ import { Event, EventCategory } from "@models";
 interface EventModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (event: any) => void;
+  onSave: (event: Event) => void;
   eventData?: Event;
 }
 
@@ -56,7 +56,7 @@ const EventModal = ({ open, onClose, onSave, eventData }: EventModalProps) => {
         start: startTime,
         end: endTime,
         reminder,
-        category,
+        category: category as EventCategory,
         id,
       });
       onClose();
@@ -96,11 +96,9 @@ const EventModal = ({ open, onClose, onSave, eventData }: EventModalProps) => {
           label="Start Time"
           fullWidth
           value={startTime}
-          onChange={(e) => {
-            const selectedDateTime = e.target.value; // This will be in the format "YYYY-MM-DDTHH:MM"
-            console.log("Selected Date and Time:", selectedDateTime);
-            setStartTime(selectedDateTime); // Update the state
-          }}
+          onChange={
+            (e) => setStartTime(e.target.value) // Update the state
+          }
           sx={{ marginBottom: 2 }}
         />
 
