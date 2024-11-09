@@ -36,27 +36,49 @@ const CustomEvent = (props: { customEvent: EventContentArg }) => {
   );
 };
 
+//   Customize the views
+const defaultViews = {
+  dayGridMonth: {
+    // Month view
+    buttonText: "Month",
+  },
+  timeGridWeek: {
+    // Week view
+    buttonText: "Week",
+  },
+  timeGridDay: {
+    // Day view
+    buttonText: "Day",
+  },
+  listMonth: {
+    // List view (can be used to show events in a list)
+    buttonText: "List",
+  },
+};
+
 interface ICalendarProps {
-  views:
-    | {
-        [viewId: string]: { buttonText: string }; // Add this type
-      }
-    | undefined;
   events: EventSourceInput;
   onEventClick?: (info: EventClickArg) => void;
   onDateClick?: (info: DateClickArg) => void;
   onEventDrop?: (info: EventDropArg) => void;
   onEventDragStop?: (info: EventDragStopArg) => void;
+  handleCreateClick?: () => void;
+  views?:
+    | {
+        [viewId: string]: { buttonText: string }; // Add this type
+      }
+    | undefined;
 }
 
 const Calendar: React.FC<ICalendarProps> = (props: ICalendarProps) => {
   const {
-    views,
+    views = defaultViews,
     events,
     onEventClick,
     onDateClick,
     onEventDrop,
     onEventDragStop,
+    handleCreateClick,
   } = props;
 
   return (
@@ -69,7 +91,13 @@ const Calendar: React.FC<ICalendarProps> = (props: ICalendarProps) => {
         headerToolbar={{
           left: "prev,next today", // Navigation buttons
           center: "title", // Title in the center
-          right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth", // Buttons for the views
+          right: "createEvent,dayGridMonth,timeGridWeek,timeGridDay,listMonth", // Buttons for the views
+        }}
+        customButtons={{
+          createEvent: {
+            text: "Create Event", // Button text
+            click: handleCreateClick, // Attach custom button click handler
+          },
         }}
         eventClick={onEventClick}
         dateClick={onDateClick}

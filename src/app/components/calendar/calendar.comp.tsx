@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { CalendarHOC } from "@hoc";
 import { EventService, EventServiceImpl } from "@services";
 import EventModal from "../event/EventModal";
 import { Event } from "@models";
 import getFormattedDate from "src/app/helpers/utils/getFormattedDate";
 import { Container, CssBaseline } from "@mui/material";
+import useAddReminder from "./useAddReminder";
 
 const eventService: EventService = new EventServiceImpl();
 
@@ -15,25 +16,8 @@ export default function CalendarComp() {
 
   const [events, setEvents] = useState<Event[]>([]);
 
-  //   Customize the views
-  const views = {
-    dayGridMonth: {
-      // Month view
-      buttonText: "Month",
-    },
-    timeGridWeek: {
-      // Week view
-      buttonText: "Week",
-    },
-    timeGridDay: {
-      // Day view
-      buttonText: "Day",
-    },
-    listMonth: {
-      // List view (can be used to show events in a list)
-      buttonText: "List",
-    },
-  };
+  //Hooks to add reminders
+  useAddReminder(events);
 
   const onDateClick = () => {
     setModalVisible(true);
@@ -61,7 +45,7 @@ export default function CalendarComp() {
     clearModalEvent();
   };
 
-  const onSave = (event: any) => {
+  const onSaveEvent = (event: any) => {
     if (eventModalData) {
       const updatedEvents = events.map((e) => (e.id === event.id ? event : e));
       setEvents(updatedEvents);
@@ -69,6 +53,14 @@ export default function CalendarComp() {
     } else {
       setEvents([...events, event]);
       eventService.createEvent(event);
+    }
+  };
+
+  const onDeleteEvent = (id: string) => {
+    if (eventModalData) {
+      eventService.deleteEvent(id);
+      setEvents(events.filter((event) => event.id !== id));
+      clearModalEvent();
     }
   };
 
@@ -94,38 +86,17 @@ export default function CalendarComp() {
     setEvents(updatedEvents); // Update the state with the new event times
   };
 
-  // Function to check for reminders and trigger them
-  const checkForReminders = () => {
-    const now = new Date(); // Current time
-    events.forEach((event: Event) => {
-      const eventStart = new Date(event.start); // Event start time
-      const reminderTime = new Date(eventStart.getTime() - 1 * 60000); // Reminder time
-
-      // If the reminder time is less than the current time, trigger the reminder
-      if (now >= reminderTime && now <= eventStart) {
-        if (event.reminder) {
-          event.reminder = false; // Mark the reminder as triggered
-          alert(`Reminder: Event "${event.title}" is starting soon!`); // Display reminder message
-        }
-      }
-    });
+  const getAllEvents = async () => {
+    try {
+      const response = await eventService.getAllEvent();
+      setEvents(response.data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  // Set up a useEffect hook to check reminders every minute
   useEffect(() => {
-    const reminderInterval = setInterval(checkForReminders, 6000); // Check every minute
-    return () => clearInterval(reminderInterval); // Cleanup on component unmount
-  }, [events]);
-
-  useEffect(() => {
-    eventService
-      .getAllEvent()
-      .then((response) => {
-        setEvents(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    getAllEvents();
   }, []);
 
   return (
@@ -133,17 +104,18 @@ export default function CalendarComp() {
       <EventModal
         open={modalVisible}
         onClose={handleClose}
-        onSave={onSave}
+        onSave={onSaveEvent}
         eventData={eventModalData}
+        onDeleteEvent={onDeleteEvent}
       />
       <Container maxWidth="lg" style={{ padding: "10px" }}>
         <CssBaseline />
         <CalendarHOC
           events={events}
-          views={views}
           onDateClick={onDateClick}
           onEventDrop={handleEventDrop}
           onEventClick={onEventClick}
+          handleCreateClick={onDateClick}
         />
       </Container>
     </>

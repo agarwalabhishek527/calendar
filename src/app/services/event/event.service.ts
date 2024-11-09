@@ -16,6 +16,12 @@ export interface EventService {
     message?: string;
   }>;
 
+  deleteEvent: (id: string) => Promise<{
+    status: "Success" | "Error" | string;
+    data?: Event;
+    message?: string;
+  }>;
+
   getAllEvent: () => Promise<{
     status: "Success" | "Error" | string;
     data: Array<Event>;

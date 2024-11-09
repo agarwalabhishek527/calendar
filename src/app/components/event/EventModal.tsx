@@ -15,10 +15,13 @@ interface EventModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (event: Event) => void;
+  onDeleteEvent: (id: string) => void;
   eventData?: Event;
 }
 
-const EventModal = ({ open, onClose, onSave, eventData }: EventModalProps) => {
+const EventModal = (props: EventModalProps) => {
+  const { open, onClose, onSave, eventData, onDeleteEvent } = props;
+
   const [eventName, setEventName] = useState("");
   const [id, setId] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -51,18 +54,24 @@ const EventModal = ({ open, onClose, onSave, eventData }: EventModalProps) => {
     }
 
     if (eventName && category && startTime && endTime && eventName) {
-      onSave({
-        title: eventName,
-        start: startTime,
-        end: endTime,
-        reminder,
-        category: category as EventCategory,
-        id,
-      });
+      onSave(
+        new Event({
+          title: eventName,
+          start: startTime,
+          end: endTime,
+          reminder,
+          category: category as EventCategory,
+          id,
+        })
+      );
       onClose();
     } else {
       alert("Please fill in all fields!");
     }
+  };
+
+  const handleDelete = () => {
+    if (eventData) onDeleteEvent(eventData.id);
   };
 
   return (
@@ -94,6 +103,7 @@ const EventModal = ({ open, onClose, onSave, eventData }: EventModalProps) => {
         <TextField
           type="datetime-local"
           label="Start Time"
+          slotProps={{ inputLabel: { shrink: true } }}
           fullWidth
           value={startTime}
           onChange={
@@ -106,6 +116,7 @@ const EventModal = ({ open, onClose, onSave, eventData }: EventModalProps) => {
         <TextField
           type="datetime-local"
           label="End Time"
+          slotProps={{ inputLabel: { shrink: true } }}
           fullWidth
           value={endTime}
           onChange={(e) => setEndTime(e.target.value)}
@@ -138,7 +149,19 @@ const EventModal = ({ open, onClose, onSave, eventData }: EventModalProps) => {
         </FormControl>
 
         {/* Save Button */}
-        <Box sx={{ display: "flex", justifyContent: "flex-end", marginTop: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: 2,
+            gap: 2,
+          }}
+        >
+          {eventData && (
+            <Button variant="contained" onClick={handleDelete}>
+              Delete Event
+            </Button>
+          )}
           <Button variant="contained" onClick={handleSave}>
             Save Event
           </Button>

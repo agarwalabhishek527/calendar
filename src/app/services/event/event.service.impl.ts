@@ -31,6 +31,16 @@ export default class EventServiceImpl
     return Promise.resolve({ status: "Success", data });
   }
 
+  async deleteEvent(id: string) {
+    const event = await IdbStorage.get(id);
+    if (!event) {
+      return Promise.reject({ status: "Error", message: "Event not found" });
+    }
+
+    await IdbStorage.delete(id);
+    return Promise.resolve({ status: "Success", message: "Event deleted" });
+  }
+
   async getAllEvent() {
     const events: Event[] = await IdbStorage.getAll();
 
