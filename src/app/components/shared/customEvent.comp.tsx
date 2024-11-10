@@ -1,6 +1,6 @@
 import { EventCategory } from "@models";
 import { EventContentArg } from "fullcalendar";
-import { EventColor } from "../helpers/constants.ts";
+import { EventColor } from "@helpers";
 
 const CustomEvent = (props: { customEvent: EventContentArg }) => {
   const category: EventCategory =

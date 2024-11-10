@@ -1,4 +1,3 @@
-// src/components/Calendar.tsx
 import React from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid"; // Month view
@@ -45,7 +44,7 @@ interface ICalendarProps {
     | undefined;
 }
 
-const Calendar: React.FC<ICalendarProps> = (props: ICalendarProps) => {
+const CalendarWrapper: React.FC<ICalendarProps> = (props: ICalendarProps) => {
   const {
     views = defaultViews,
     events,
@@ -86,4 +85,4 @@ const Calendar: React.FC<ICalendarProps> = (props: ICalendarProps) => {
   );
 };
 
-export default Calendar;
+export default CalendarWrapper;

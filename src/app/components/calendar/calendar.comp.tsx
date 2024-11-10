@@ -1,11 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { CalendarHOC } from "@hoc";
-import { EventService, EventServiceImpl } from "@services";
-import EventModal from "../event/EventModal";
-import { Event } from "@models";
-import getFormattedDate from "src/app/helpers/utils/getFormattedDate";
 import { Container, CssBaseline } from "@mui/material";
+
+import { EventService, EventServiceImpl } from "@services";
+import { CalendarWrapper } from "@components/shared";
+import { getFormattedDate } from "@helpers";
+import { Event } from "@models";
+
+import EventModal from "../event/EventModal";
 import useAddReminder from "./useAddReminder";
 
 const eventService: EventService = new EventServiceImpl();
@@ -110,7 +112,7 @@ export default function CalendarComp() {
       />
       <Container maxWidth="lg" style={{ padding: "10px" }}>
         <CssBaseline />
-        <CalendarHOC
+        <CalendarWrapper
           events={events}
           onDateClick={onDateClick}
           onEventDrop={handleEventDrop}
